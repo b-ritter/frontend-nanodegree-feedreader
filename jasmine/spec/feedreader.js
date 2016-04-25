@@ -32,21 +32,42 @@ $(function() {
          * and that the URL is not empty.
          */
 
+         it('have defined urls', function() {
+            allFeeds.forEach(function(feed) {
+                expect(feed.url).toBeDefined();
+                expect(feed.url).not.toBe('');
+                return feed;
+            });
+         });
 
         /* TODO: Write a test that loops through each feed
          * in the allFeeds object and ensures it has a name defined
          * and that the name is not empty.
          */
+
+         it('have defined names', function() {
+            allFeeds.forEach(function(feed) {
+                expect(feed.name).toBeDefined();
+                expect(feed.url).not.toBe('');
+                return feed;
+            });
+         });
+
     });
 
-
     /* TODO: Write a new test suite named "The menu" */
-
+    describe('The Menu', function() {
         /* TODO: Write a test that ensures the menu element is
          * hidden by default. You'll have to analyze the HTML and
          * the CSS to determine how we're performing the
          * hiding/showing of the menu element.
          */
+         var body = $('body'),
+            menuIcon = $('.menu-icon-link'),
+            slideMenu = $('.slide-menu'),
+            hiddenMatrix = 'matrix(1, 0, 0, 1, -192, 0)',
+            visibleMatrix = 'matrix(1, 0, 0, 1, 0, 0)',
+            previousMenuTransform = hiddenMatrix;
 
          /* TODO: Write a test that ensures the menu changes
           * visibility when the menu icon is clicked. This test
@@ -54,7 +75,35 @@ $(function() {
           * clicked and does it hide when clicked again.
           */
 
-    /* TODO: Write a new test suite named "Initial Entries" */
+        beforeEach(function(done){
+            menuIcon.click();
+            slideMenu.on('webkitTransitionEnd otransitionend oTransitionEnd msTransitionEnd transitionend', function(){
+                done();
+            });
+        });
+
+        it ('is visible on click', function(done) {
+            expect(slideMenu.css('transform')).toEqual(visibleMatrix);
+            done();
+        }); 
+
+        it ('is hidden on another click', function(done) {
+            expect(slideMenu.css('transform')).toEqual(hiddenMatrix);
+            done();
+        });
+
+    });
+    
+
+  /* TODO: Write a new test suite named "Initial Entries" */
+    describe('Initial Entries', function(){
+        var feed = $('.feed'),
+            entries,
+            initialFeedContent;
+
+        beforeEach(function(done){
+            loadFeed(0, done);
+        });
 
         /* TODO: Write a test that ensures when the loadFeed
          * function is called and completes its work, there is at least
@@ -62,11 +111,57 @@ $(function() {
          * Remember, loadFeed() is asynchronous so this test will require
          * the use of Jasmine's beforeEach and asynchronous done() function.
          */
+        it ('has at least one entry', function(done){
+            entries = feed.find('.entry');
+            initialFeedContent = entries.find('h2').map(function(){
+                return this.innerHTML;
+            });
+            expect(entries.length).toBeGreaterThan(0);
 
-    /* TODO: Write a new test suite named "New Feed Selection"
+            done();
+        });
 
-        /* TODO: Write a test that ensures when a new feed is loaded
-         * by the loadFeed function that the content actually changes.
-         * Remember, loadFeed() is asynchronous.
-         */
+        /* TODO: Write a new test suite named "New Feed Selection" */
+        describe('New Feed Selection', function(){
+            var feedList = $('.feed-list').find('a'),
+                numberOfFeeds = feedList.length;
+
+            
+
+            beforeEach(function(done){
+                // Assuming feed 0 is loaded, choose a random feed from those remaining
+                var randomFeed = Math.floor( 1 + Math.random() * (numberOfFeeds - 1) );
+
+                // Setting randomFeed = 0 loads duplicate content, causing expectations
+                // to fail
+
+                feed.empty();
+                loadFeed(randomFeed, done);
+            });
+
+            /* TODO: Write a test that ensures when a new feed is loaded
+             * by the loadFeed function that the content actually changes.
+             * Remember, loadFeed() is asynchronous.
+             */
+
+            it ('actually has new content', function(done){
+                
+                var newEntries = feed.find('.entry'),
+                    newFeedContent = newEntries.find('h2').map(function(){
+                        return this.innerHTML;
+                    });
+                    // console.log(initialFeedContent);
+
+                newFeedContent.each(function(index){
+                    // console.log(newFeedContent[index]);
+                    // console.log(initialFeedContent[index]);
+                    expect(newFeedContent[index]).not.toEqual(initialFeedContent[index]);
+                });
+                    
+              
+                done();
+            });
+        });
+    });
+
 }());
