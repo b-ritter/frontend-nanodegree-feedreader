@@ -67,63 +67,59 @@ $(function() {
 
     //  A new test suite named "Initial Entries"
     describe('Initial Entries', function(){
-        var feed = $('.feed'),
-            initialFeedContent;
-
+        //  Use the async features of Jasmine
         beforeEach(function(done){
             loadFeed(0, done);
         });
 
-        //A test that ensures when the loadFeed
-        //function is called and completes its work, there is at least
-        //a single .entry element within the .feed container.
-        it ('has at least one entry', function(done){
-            // Load and store the content first set of RSS feed entries for
-            // comparison in 'actually has new content' spec
-            initialFeedContent = feed.find('.entry h2').map(function(){
-                return this.innerHTML;
-            });
-
-            // If there is at least one entry in the .feed container
-            // we pass the test
-            expect(initialFeedContent.length).toBeGreaterThan(0);
-
-            done();
+        //  A test that ensures when the loadFeed
+        //  function is called and completes its work, there is at least
+        //  a single .entry element within the .feed container.
+        it ('has at least one entry', function(){
+            //  If there is at least one entry in the .feed container
+            //  we pass the test
+            expect($('.feed .entry').length).toBeGreaterThan(0);
         });
+    });
 
-        //  A new test suite named "New Feed Selection" 
-        //  Requires initialFeedContent from outside scope
-        describe('New Feed Selection', function(){
-            // Get the number of feeds available from the menu
-            var numberOfFeeds = $('.feed-list').find('a').length;
+    //  A new test suite named "New Feed Selection" 
+    //  Requires initialFeedContent from outside scope
+    describe('New Feed Selection', function(){
+        // Get the number of feeds available from the menu
+        var initFeedContent,
+            newFeedContent,
+            numberOfFeeds = $('.feed-list').find('a').length;
 
-            beforeEach(function(done){
-                // Clear out the exisiting feeds from the DOM
-                feed.empty();
-
-                // Assuming feed 0 is loaded, choose a random feed from those remaining
+        beforeEach(function(done){
+            //  Load content from feed 0
+            loadFeed(0, function(){
+                //  Store the initial feed content for comparison
+                initFeedContent = $('.feed .entry h2').map(function(){
+                    return this.innerHTML;
+                });
+                //  Choose an index to select a random feed other than feed 0
                 var randomFeed = Math.floor( 1 + Math.random() * (numberOfFeeds - 1) );
 
-                // Load a new random feed
-                loadFeed(randomFeed, done);
-            });
-
-            //A test that ensures when a new feed is loaded
-            //by the loadFeed function that the content actually changes.
-            it ('actually has new content', function(done){
-                // Now that the content has loaded, map it to a new collection
-                // which we will compare to the initialFeedContent
-                var newFeedContent = feed.find('.entry h2').map(function(){
+                //  Load a new random feed
+                loadFeed(randomFeed, function(){
+                    //  Save new content
+                    newFeedContent = $('.feed .entry h2').map(function(){
                         return this.innerHTML;
                     });
-                console.log(newFeedContent, initialFeedContent);
-
-                // The comparison happens here
-                newFeedContent.each(function(index){
-                    expect(newFeedContent[index]).not.toEqual(initialFeedContent[index]);
+                    // Finish up
+                    done();
                 });
-              
-                done();
+            });
+            
+        });
+
+        //  A test that ensures when a new feed is loaded
+        //  by the loadFeed function that the content actually changes.
+        it ('actually has new content', function(){
+            //  Now that the content has loaded, map it to a new collection
+            //  which we will compare to the initialFeedContent
+            newFeedContent.each(function(index){
+                expect(newFeedContent[index]).not.toEqual(initFeedContent[index]);
             });
         });
     });
