@@ -12,7 +12,6 @@ $(function() {
         //  A test that loops through each feed
         //  in the allFeeds object and ensures it has a URL defined
         //  and that the URL is not empty.
-        //
         it('have defined urls', function() {
             allFeeds.forEach(function(feed) {
                 expect(feed.url).toBeDefined();
@@ -117,6 +116,7 @@ $(function() {
                 var newFeedContent = feed.find('.entry h2').map(function(){
                         return this.innerHTML;
                     });
+                console.log(newFeedContent, initialFeedContent);
 
                 // The comparison happens here
                 newFeedContent.each(function(index){
