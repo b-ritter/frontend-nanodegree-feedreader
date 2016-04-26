@@ -83,7 +83,6 @@ $(function() {
     });
 
     //  A new test suite named "New Feed Selection" 
-    //  Requires initialFeedContent from outside scope
     describe('New Feed Selection', function(){
         // Get the number of feeds available from the menu
         var initFeedContent,
